@@ -1,5 +1,5 @@
 BUILDDIR =  build
-VERSION = 1.0.7-1
+VERSION = 1.0.8
 TARFILE = cyg-apt-$(VERSION).tar.bz2
 SRCTARFILE = cyg-apt-$(VERSION)-src.tar.bz2
 TOOLS = tools

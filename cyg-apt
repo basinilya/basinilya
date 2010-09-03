@@ -54,10 +54,15 @@ class CygAptSetup:
             }
         self.sn = os.path.basename(sys.argv[0])
         self.rc_regex = re.compile("^\s*(\w+)\s*=\s*(.*)\s*$")
-        if os.environ['TMP']: 
+
+        self.tmpdir = ""
+        try:
             self.tmpdir = os.environ['TMP']
-        else:
-            self.tmpdir = "/usr/share/cyg-apt"
+        except KeyError:
+            pass
+        if not self.tmpdir:
+            self.tmpdir = "/tmp"
+
         self.gpg_good_sig_msg = "1169 DF9F 2273 4F74 3AA5  9232 A9A2 62FF 6760 41BA"    
         #self.gpg_good_sig_msg = "Good signature"    
        
@@ -122,10 +127,11 @@ class CygAptSetup:
         self.mirror = last_mirror
         self.cache = last_cache
 
-        cygwin_version = os.uname()[2][:3]
-        if cygwin_version == "1.7":
+        cygwin_version = os.uname()[2][:5]
+        if cygwin_version == "1.7.0":
             self.setup_ini = self.config + "/setup-2.ini"
         else:
+            cygwin_version = cygwin_version[:3]
             self.setup_ini = self.config + "/setup.ini"
         self.cygwin_version = float(cygwin_version)
         distname = "curr"
@@ -149,7 +155,8 @@ class CygAptSetup:
             self.write_installed()
         if not os.path.isfile(self.setup_ini):
             sys.stderr.write('getting %s\n' % self.setup_ini)
-            self.update(self.cyg_apt_rc) 
+            # TODO: use main_verify here
+            self.update(self.cyg_apt_rc, True) 
         
         
     def usage(self, cyg_apt_rc=None):
@@ -260,6 +267,7 @@ class CygAptSetup:
                 else:
                     gpg_path = "/usr/local/bin/gpg "
             cmd = gpg_path + "--verify --no-secmem-warning "
+            cmd += "--homedir /etc/setup/gnupg "
             cmd += self.tmpdir + "/" + sig_name + " "
             cmd += self.tmpdir + "/" + setup_ini_name
             verify = os.popen3(cmd)[2].read()
@@ -334,7 +342,10 @@ def uri_get(dir, uri, verbose=True):
     scriptname = os.path.basename(sys.argv[0])
     
     if up.scheme == "file":
-        shutil.copy(uri[7:], dir)
+        try:
+            shutil.copy(uri[7:], dir)
+        except IOError:
+            raise CygAptError("bad URL %s" % uri)
         if verbose:
             print "cp %s %s" % (uri[7:], dir)
         ret = 0
@@ -597,7 +608,7 @@ class CygApt:
         if self.dists:
             return
         self.dists = {'test': {}, 'curr': {}, 'prev' : {}}
-        chunks = string.split(open(self.setup_ini).read(), '\n\n@ ')
+        chunks = string.split(open(self.setup_ini,"rU").read(), '\n\n@ ')
         for i in chunks[1:]:
             lines = string.split(i, '\n')
             name = string.strip(lines[0])
@@ -623,7 +634,7 @@ class CygApt:
                 except:
                     print lines[j]
                     raise
-                if value[0] == '"' and value.find('"', 1) == -1:
+                if value.find('"') != -1 and value.find('"', value.find('"') + 1) == -1:
                     while 1:
                         j = j + 1
                         value += '\n' + lines[j]
@@ -890,7 +901,8 @@ class CygApt:
         print '%s  %s' % (md5, ball)
         actual_md5 = self.get_md5()
         print '%s  %s' % (actual_md5, ball)
-        assert(actual_md5 == md5)
+        if actual_md5 != md5:
+            raise CygAptError("md5sum of cached package doesn't match md5 in setup.ini from mirror")
     
         
     def search(self):
@@ -1047,6 +1059,17 @@ class CygApt:
         finally:
             rmtree(tempdir)
 
+    def is_empty_tar(self, name):
+        try:
+            fileobj = tarfile._Stream(name, "r", "*", None, 10240)
+            try:
+                if fileobj.read(1024).count("\0") == 1024:
+                    return True
+            finally:
+                fileobj.close()
+        except Exception:
+            pass
+        return False
 
     def do_install(self):
         ball = self.get_ball()
@@ -1068,6 +1091,9 @@ class CygApt:
                         lst.append(m.name + "/")
                     else:
                         lst.append(m.name)
+        elif self.is_empty_tar(ball):
+            sys.stderr.write("WARNING installing empty tarball.\n")
+            lst = []
         else:
             print >> sys.stderr,\
             "%s: bad tarball %s. Install failed." % (self.sn, ball)
