@@ -334,7 +334,10 @@ def uri_get(dir, uri, verbose=True):
     scriptname = os.path.basename(sys.argv[0])
     
     if up.scheme == "file":
-        shutil.copy(uri[7:], dir)
+        try:
+            shutil.copy(uri[7:], dir)
+        except IOError:
+            raise CygAptError("bad URL %s" % uri)
         if verbose:
             print "cp %s %s" % (uri[7:], dir)
         ret = 0
