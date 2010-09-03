@@ -266,6 +266,7 @@ class CygAptSetup:
                 else:
                     gpg_path = "/usr/local/bin/gpg "
             cmd = gpg_path + "--verify --no-secmem-warning "
+            cmd += "--homedir /etc/setup/gnupg "
             cmd += self.tmpdir + "/" + sig_name + " "
             cmd += self.tmpdir + "/" + setup_ini_name
             verify = os.popen3(cmd)[2].read()
