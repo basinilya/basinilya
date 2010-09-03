@@ -1048,6 +1048,17 @@ class CygApt:
         finally:
             rmtree(tempdir)
 
+    def is_empty_tar(self, name):
+        try:
+            fileobj = tarfile._Stream(name, "r", "*", None, 10240)
+            try:
+                if fileobj.read(1024).count("\0") == 1024:
+                    return True
+            finally:
+                fileobj.close()
+        except Exception:
+            pass
+        return False
 
     def do_install(self):
         ball = self.get_ball()
@@ -1069,6 +1080,9 @@ class CygApt:
                         lst.append(m.name + "/")
                     else:
                         lst.append(m.name)
+        elif self.is_empty_tar(ball):
+            sys.stderr.write("WARNING installing empty tarball.\n")
+            lst = []
         else:
             print >> sys.stderr,\
             "%s: bad tarball %s. Install failed." % (self.sn, ball)
