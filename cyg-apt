@@ -54,10 +54,15 @@ class CygAptSetup:
             }
         self.sn = os.path.basename(sys.argv[0])
         self.rc_regex = re.compile("^\s*(\w+)\s*=\s*(.*)\s*$")
-        if os.environ['TMP']: 
+
+        self.tmpdir = ""
+        try:
             self.tmpdir = os.environ['TMP']
-        else:
-            self.tmpdir = "/usr/share/cyg-apt"
+        except KeyError:
+            pass
+        if not self.tmpdir:
+            self.tmpdir = "/tmp"
+
         self.gpg_good_sig_msg = "1169 DF9F 2273 4F74 3AA5  9232 A9A2 62FF 6760 41BA"    
         #self.gpg_good_sig_msg = "Good signature"    
        
