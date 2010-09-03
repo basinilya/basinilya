@@ -122,10 +122,11 @@ class CygAptSetup:
         self.mirror = last_mirror
         self.cache = last_cache
 
-        cygwin_version = os.uname()[2][:3]
-        if cygwin_version == "1.7":
+        cygwin_version = os.uname()[2][:5]
+        if cygwin_version == "1.7.0":
             self.setup_ini = self.config + "/setup-2.ini"
         else:
+            cygwin_version = cygwin_version[:3]
             self.setup_ini = self.config + "/setup.ini"
         self.cygwin_version = float(cygwin_version)
         distname = "curr"
