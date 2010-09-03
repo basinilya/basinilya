@@ -597,7 +597,7 @@ class CygApt:
         if self.dists:
             return
         self.dists = {'test': {}, 'curr': {}, 'prev' : {}}
-        chunks = string.split(open(self.setup_ini).read(), '\n\n@ ')
+        chunks = string.split(open(self.setup_ini,"rU").read(), '\n\n@ ')
         for i in chunks[1:]:
             lines = string.split(i, '\n')
             name = string.strip(lines[0])
