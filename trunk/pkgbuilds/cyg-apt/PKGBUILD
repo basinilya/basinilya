@@ -1,0 +1,31 @@
+pkgname=cyg-apt
+pkgver=1.0.8
+pkgrel=1
+pkgdesc="A Cygwin package manager"
+arch=(cygwin)
+url="http://code.google.com/p/cyg-apt/"
+groups=('Utils')
+depends=( cygwin coreutils 'gnupg' 'python>=2.6.5')
+source=("http://basinilya.googlecode.com/files/cyg-apt-$pkgver.tar.bz2"
+        'cyg-apt.install' )
+md5sums=('47e4c1a58911b5971ad69fd4063be0d3'
+         'e03ec5dee5b8e162bbeeb9a4b4610324')
+
+install=cyg-apt.install
+
+_cygwin_lpkgdesc="A Cygwin package manager.
+Allows you to install and remove packages on the command line, and provides other package management functions. It has a command syntax similar to apt-get and dpkg."
+
+build() {
+  cd "$srcdir/cyg-apt-$pkgver"
+  install -d "$pkgdir/etc/setup/gnupg" || return 1
+  gpg --import --no-permission-warning --no-secmem-warning --homedir "$pkgdir/etc/setup/gnupg" cygwin.sig \
+    && chmod +r "$pkgdir/etc/setup/gnupg"/* \
+    || return 1
+  install -d "$pkgdir/usr/share/man/man1" && \
+  install -d "$pkgdir/etc/skel" && \
+  install -d "$pkgdir/usr/bin" && \
+    gzip -c cyg-apt.1 > "$pkgdir/usr/share/man/man1/cyg-apt.1.gz" && \
+    install -m755 cyg-apt "$pkgdir/usr/bin/cyg-apt"
+}
+

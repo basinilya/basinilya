@@ -1,0 +1,23 @@
+pkgname=cyg-apt
+
+post_install() {
+  # cyg-apt searches for .cyg-apt in $HOME
+  HOME=/etc/skel /usr/bin/cyg-apt setup
+}
+
+pre_upgrade() {
+  pre_remove $1
+}
+
+post_upgrade() {
+  post_install $1
+}
+
+pre_remove() {
+  rm -f /etc/skel/.cyg-apt
+}
+
+post_remove() {
+  return 0
+}
+
