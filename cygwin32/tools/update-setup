@@ -1,0 +1,35 @@
+#!/bin/bash
+repodir=`cd "\`dirname \"$0\"\`"/.. && pwd`
+
+srcdir=`dirname "$1"`
+
+fn_debug() {
+  echo "DEBUG: $*" >&2
+}
+
+excludes=`"$repodir/tools/setup-tool" -c cat -i "$1" -H -f 'name: -x %s'` \
+  && echo "updating packages: " $excludes \
+  && [ ! -f "$repodir/setup.ini.save" ] || {
+    echo "$repodir/setup.ini.save" exists
+    exit 1
+  } \
+  && cp "$repodir/setup.ini" "$repodir/setup.ini.save" \
+  && "$repodir/tools/setup-tool" -c cat -i "$repodir/setup.ini.save" $excludes > "$repodir/setup.ini.new" \
+  && "$repodir/tools/setup-tool" -c cat -i "$1" -H >> "$repodir/setup.ini.new" \
+  && files=`"$repodir/tools/setup-tool" -c cat -i "$1" -H -d -f 'install_ball source_ball:%s\n%s\n' | while read -r f; do [ -z "$f" ] || echo "\"$f\""; done` \
+  && ( cd "$srcdir" && eval "tar -vcf - $files" ) | ( cd "$repodir" && tar -vxf - ) \
+  && cmp -s "$repodir/setup.ini.new" "$repodir/setup.ini" \
+  || {
+    echo "updating $repodir/setup.ini"
+    cat "$repodir/setup.ini.new" > "$repodir/setup.ini" \
+      && bzip2 -c "$repodir/setup.ini" > "$repodir/setup.bz2"
+  } \
+  && rm "$repodir/setup.ini.new" "$repodir/setup.ini.save" \
+  && echo OK
+
+#  && diff -u "$repodir/setup.ini.save" "$repodir/setup.ini.new" | less \
+
+#  && diff -u "$repodir/setup.ini.save" "$repodir/setup.ini.new" | less \
+
+# clear; ( ~/builds/cyg-apt/basinilya/cygwin32/tools/update-setup -c cat -i ~/setup.ini   ) 2>&1
+

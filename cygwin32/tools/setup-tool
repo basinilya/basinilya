@@ -1,0 +1,312 @@
+#!/bin/bash
+
+fn_debug() {
+  return 0
+  echo "DEBUG: $*" >&2
+}
+
+fn_usage() {
+  echo "usage: update-setup [options...] -c command [command options]"
+  echo "-c,--command cat"
+  echo "cat options: -ix[Hf]"
+  echo "-i,--ini       path/to/setup.ini or setup.hint"
+  echo "-x,--exclude   example: -x pkg1 -x pkg2... or -x '*'"
+  echo "-H,--no-header "
+  echo "-d,--on-dist   Output for each dist"
+  echo "-f,--format    example: -f 'name sdesc dist_curr_version dist_prev_version:%s %s %s %s\n' "
+  echo ""
+}
+
+fn_debug "starting"
+
+if [ $# -eq 0 ]; then
+  fn_usage >&2
+  echo "Terminating..." >&2 ; exit 1 ;
+fi
+
+TEMP=`getopt -o Hdc:i:x:f: --long no-header,on-dist,command:,ini:,exclude:,format: \
+     -n 'update-setup' -- "$@"`
+
+if [ $? != 0 ] ; then
+  echo "FATAL: error parsing arguments, Terminating..." >&2
+  exit 1
+fi
+
+eval set -- "$TEMP"
+
+#echo "$TEMP" >&2
+
+command=
+ini=
+noheader=
+format=
+ondist=
+excludes=('')
+while true ; do
+	case "$1" in
+		-c|--command) command="$2"; shift 2 ;;
+		-i|--ini) ini="$2"; shift 2 ;;
+		-x|--exclude) excludes[${#excludes[@]}]="$2"; shift 2 ;;
+		-H|--no-header) noheader=y; shift ;;
+		-d|--on-dist) ondist=y; shift ;;
+		-f|--format) format="$2"; shift 2 ;;
+		--) shift ; break ;;
+		*) echo "FATAL: unknown option: \"$1\", Terminating..." >&2 ; exit 1 ;;
+	esac
+done
+excludes[${#excludes[@]}]=''
+
+if [ $# -gt 0 ]; then
+  echo "FATAL: no additional arguments supported, Terminating..." >&2
+  exit 1
+fi
+
+lf="
+"
+
+fn_parse() {
+  fn_reset_dist_vars() {
+    unset pkg_install_ball
+    unset pkg_install_sz
+    unset pkg_install_md5
+
+    unset pkg_source_ball
+    unset pkg_source_sz
+    unset pkg_source_md5
+
+    unset pkg_version
+  }
+
+  fn_reset_vars() {
+    pkg_full=
+    pkg_name=
+    pkg_setup_version=
+    pkg_setup_timestamp=
+    pkg_sdesc=
+    pkg_ldesc=
+    pkg_category=
+    pkg_requires=
+    pkg_isexcluded=
+
+    for pkg_dist in "${pkg_dists[@]}"; do
+      unset "pkg_dist_${pkg_dist}_install_ball"
+      unset "pkg_dist_${pkg_dist}_install_sz"
+      unset "pkg_dist_${pkg_dist}_install_md5"
+
+      unset "pkg_dist_${pkg_dist}_source_ball"
+      unset "pkg_dist_${pkg_dist}_source_sz"
+      unset "pkg_dist_${pkg_dist}_source_md5"
+
+      unset "pkg_dist_${pkg_dist}_version"
+    done
+
+    pkg_dist=curr
+    pkg_dists=(curr)
+  }
+
+  fn_dist_end() {
+    [ "$pkg_name" ] || return 0
+    fn_on_dist
+    fn_reset_dist_vars
+  }
+
+  fn_pkg_end() {
+    [ "$pkg_full" ] || return 0
+    fn_dist_end
+    fn_on_pkg
+    fn_reset_vars
+    return 0
+  }
+
+  dfltIFS="$IFS"
+
+
+  fn_reset_vars
+  while true; do
+    ln_empty=0
+    ln_comment=0
+    IFS=
+    read -r ln_full || {
+      IFS="$dfltIFS"
+      fn_pkg_end
+      break
+    }
+    IFS="$dfltIFS"
+
+    set -- $ln_full
+
+    case $1 in
+    '#'*) ln_comment=1; ;;
+    esac
+
+    if [ $ln_comment -eq 0 ]; then
+      # read the rest of quoted
+      case "$ln_full" in
+      *'"'*'"'*)
+        :
+        ;;
+      *'"'*)
+        ln_rest=
+        IFS=
+        read -r -d '"' ln_rest && ln_rest="${ln_rest}\""
+        ln_full="${ln_full}${lf}${ln_rest}"
+        ln_rest=
+        read -r ln_rest
+        ln_full="${ln_full}${ln_rest}"
+        IFS="$dfltIFS"
+        ;;
+      esac
+    fi
+
+    case "$ln_full" in
+    *'"'*'"'*'"'*)
+      echo "FATAL: encountered 3+ quotes in 1 entry" >&2
+      echo "$ln_full" >&2
+      exit 1
+      ;;
+    esac
+
+    case $1 in
+    '#'*) ln_comment=1; ;;
+    '') ln_empty=1; ;;
+    '@')
+      fn_pkg_end
+      pkg_name="$2"
+      ;;
+    'setup-version:')
+      pkg_setup_version="$2"
+      ;;
+    'setup-timestamp:')
+      pkg_setup_timestamp="$2"
+      ;;
+    'sdesc:')
+      pkg_sdesc="${ln_full:6}"
+      ;;
+    'ldesc:')
+      pkg_ldesc="${ln_full:6}"
+      ;;
+    'category:')
+      pkg_category="$2"
+      ;;
+    'requires:')
+      pkg_requires="${ln_full:9}"
+      ;;
+    'version:')
+      pkg_version="$2"
+
+      declare "pkg_dist_${pkg_dist}_version=$2"
+      ;;
+    'install:')
+      pkg_install_ball="$2"
+      pkg_install_sz="$3"
+      pkg_install_md5="$4"
+
+      declare "pkg_dist_${pkg_dist}_install_ball=$2"
+      declare "pkg_dist_${pkg_dist}_install_sz=$3"
+      declare "pkg_dist_${pkg_dist}_install_md5=$4"
+      ;;
+    'source:')
+      pkg_source_ball="$2"
+      pkg_source_sz="$3"
+      pkg_source_md5="$4"
+
+      declare "pkg_dist_${pkg_dist}_source_ball=$2"
+      declare "pkg_dist_${pkg_dist}_source_sz=$3"
+      declare "pkg_dist_${pkg_dist}_source_md5=$4"
+      ;;
+    '['*)
+      fn_dist_end
+      pkg_dist="${1:1:$((${#1}-2))}"
+      pkg_dists[${#pkg_dists[@]}]="$pkg_dist"
+      ;;
+    esac
+
+    [ "$pkg_full" ] && pkg_full="${pkg_full}${lf}${ln_full}" || pkg_full="${ln_full}"
+  done < "$ini"
+}
+
+# defaults
+fn_on_pkg() {
+  return 0
+}
+fn_on_dist() {
+  return 0
+}
+
+fn_cat() {
+  all_excluded=
+  fn_pkg_isexcluded() {
+    [ "$pkg_isexcluded" ] && return 0
+    if [ "$pkg_name" ]; then
+      case "${excludes[@]}" in
+        *" * "*)
+          [ "$all_excluded" ] || fn_debug "Excluding all packages"
+          all_excluded=y
+          pkg_isexcluded=y
+          return 0
+          ;;
+        *" $pkg_name "*)
+          fn_debug "Excluding $pkg_name"
+          pkg_isexcluded=y
+          return 0
+          ;;
+      esac
+    fi
+    return 1
+  }  
+
+  if [ "$format" ]; then
+    fmt_named="${format%%:*}"
+    fmt_named=${fmt_named//[^a-z0-9_ ]/_}
+    format="${format#*:}"
+    printf_args=
+    for s in $fmt_named; do
+      printf_args="$printf_args \"\$pkg_${s//\"/_}\""
+    done
+    #echo "${printf_args}"
+    fn_print() {
+      eval 'printf "$format" '"$printf_args"
+      #echo "$pkg_name"
+    }
+  else
+    fn_print() {
+      echo "$pkg_full"
+    }
+  fi
+  if [ "$ondist" ]; then
+    fn_on_dist() {
+      fn_pkg_isexcluded && return 0
+      fn_debug "fn_on_dist"
+      fn_print
+      return 0
+    }
+  else
+    fn_on_pkg() {
+      fn_pkg_isexcluded && return 0
+      if [ -z "$pkg_name" -a "$noheader" ]; then
+        fn_debug "Omitting header"
+        return 0
+      fi
+      fn_print
+      return 0
+    }
+  fi
+
+  fn_parse
+}
+
+case "$command" in
+	cat)
+    if [ -z "$ini" ]; then
+      echo "FATAL: missing -i path/to/setup.ini, Terminating..." >&2
+      exit 1
+    fi
+    fn_cat
+	  ;;
+	'') 
+    echo "FATAL: missing -c command, Terminating..." >&2
+    exit 1
+	  ;;
+		*) echo "FATAL: unknown command: \"$command\", Terminating..." >&2 ; exit 1 ;;
+esac
+

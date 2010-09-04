@@ -1,0 +1,37 @@
+#!/bin/sh
+
+fn_pkg_end() {
+  [ "$pkg_name" ] || return 0
+  # echo "fn_pkg_end $pkg_name"
+}
+
+fn_reset_vars() {
+  pkg_name=
+}
+
+for d in *; do
+  [ -f "$d/setup.ini" ] || continue
+  echo "#checking: $d"
+  fn_reset_vars
+  while true; do
+    read -r f0 f1 f2 f3 f4 f5 f6 f7 f8 f9 fa || {
+      fn_pkg_end
+      break
+    }
+    case $f0 in
+    '#'*) continue; ;; '') continue; ;;
+    '@')
+      fn_pkg_end
+      fn_reset_vars
+      pkg_name="$f1"
+      ;;
+    'install:')
+      [ -f "$d/$f1" ] && echo "$f3  $d/$f1"
+      ;;
+    'source:')
+      [ -f "$d/$f1" ] && echo "$f3  $d/$f1"
+      ;;
+    esac
+  done < "$d/setup.ini"
+done
+
