@@ -1,0 +1,17 @@
+diff -ur old//src/common.c new//src/common.c
+--- old//src/common.c	2010-09-08 11:58:29.079474300 +0400
++++ new//src/common.c	2010-09-08 12:01:14.938849300 +0400
+@@ -247,9 +247,13 @@
+ #ifdef _SOLARIS
+ 	timezone = -altzone / 60;
+ #else
++#ifdef __CYGWIN__
++	timezone = -tz.tz_minuteswest + tz.tz_dsttime?60:0;
++#else
+ 	timezone = tm->tm_gmtoff / 60;
+ #endif
+ #endif
++#endif
+ 
+ 	delay = param->time_start?((unsigned) ((sec - param->time_start))*1000 + msec) - param->msec_start : 0;
+ 	*buf = 0;

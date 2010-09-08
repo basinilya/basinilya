@@ -6,8 +6,10 @@ arch=(i686 x86_64 cygwin)
 url="http://www.3proxy.ru/"
 license=('BSD')
 depends=()
-source=("http://www.3proxy.ru/$pkgver/3proxy-$pkgver.tgz")
-md5sums=('03790467a12e16ed8785ae688ecf9b68')
+source=("http://www.3proxy.ru/$pkgver/3proxy-$pkgver.tgz"
+        cygwin.patch)
+md5sums=('03790467a12e16ed8785ae688ecf9b68'
+         'bcfd75484bf28424ac1e7b7fa9ddaa62')
 
 _cygwin_groups=('Net')
 _cygwin_lpkgdesc="3Proxy tiny free proxy server is really tiny cross-platform (Win32/Win64&Unix)
@@ -20,6 +22,12 @@ _prefix=/usr
 _etcdir=/etc/3proxy
 build() {
   cd "$srcdir/3proxy-$pkgver"
+  cp src/proxy.h src/proxy.h~ && sed s/__CYGWIN__/__OLDCYGWIN__/g src/proxy.h~ > src/proxy.h || return 1
+  cp Makefile.Linux Makefile.Linux~ && sed 's/^\(CFLAGS =\)/\1 -Werror-implicit-function-declaration /' Makefile.Linux~ > Makefile.Linux || return 1
+  if [ "$pkg_arch" = "cygwin" ]; then
+    sed -i 's/^\(CFLAGS =.*\)-DGETHOSTBYNAME_R/\1/' Makefile.Linux
+  fi
+  patch -p1 -i ../cygwin.patch
   make='make -f Makefile.Linux INSTALL=/bin/install'
   $make prefix="$_prefix" ETCDIR="$_etcdir"
   $make prefix="$_prefix" install DESTDIR="$pkgdir" ETCDIR="${pkgdir}${_etcdir}"
