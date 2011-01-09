@@ -2,7 +2,8 @@ pkgname=cyg-apt
 
 post_install() {
   # cyg-apt searches for .cyg-apt in $HOME
-  HOME=/etc/skel /usr/bin/cyg-apt setup
+  HOME=/etc/skel /usr/bin/cyg-apt setup || echo "If /etc/skel/.cyg-apt created, please ignore errors above" >&2
+  test -f /etc/skel/.cyg-apt
 }
 
 pre_upgrade() {
