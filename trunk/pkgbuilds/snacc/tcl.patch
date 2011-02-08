@@ -1,0 +1,235 @@
+diff -ur snacc-1.3.old/c++-lib/src/asn-bool.C snacc-1.3/c++-lib/src/asn-bool.C
+--- snacc-1.3.old/c++-lib/src/asn-bool.C	2011-02-08 18:43:23.645927500 +0300
++++ snacc-1.3/c++-lib/src/asn-bool.C	2011-02-08 18:43:55.818214300 +0300
+@@ -130,7 +130,7 @@
+ 
+ int AsnBool::TclGetVal (Tcl_Interp *interp) const
+ {
+-  Tcl_SetResult (interp, value ? "TRUE" : "FALSE", TCL_STATIC);
++  Tcl_SetResult (interp, (char*) (value ? "TRUE" : "FALSE"), TCL_STATIC);
+   return TCL_OK;
+ }
+ 
+diff -ur snacc-1.3.old/c++-lib/src/asn-oid.C snacc-1.3/c++-lib/src/asn-oid.C
+--- snacc-1.3.old/c++-lib/src/asn-oid.C	2011-02-08 18:43:23.755303900 +0300
++++ snacc-1.3/c++-lib/src/asn-oid.C	2011-02-08 18:43:55.849464700 +0300
+@@ -365,7 +365,7 @@
+ {
+   if (oid)
+   {
+-    strstream buf;
++    std::strstream buf;
+     buf << *this;
+     buf.str()[strlen(buf.str())-1] = '\0';			// chop the trailing '}'
+     Tcl_SetResult (interp, buf.str()+1, TCL_VOLATILE);	// copy without leading '{'
+@@ -384,7 +384,7 @@
+   }
+ 
+   Args arc;
+-  if (Tcl_SplitList (interp, (char*)valstr, &arc.c, &arc.v) != TCL_OK)
++  if (Tcl_SplitList (interp, (char*)valstr, &arc.c, (const char***)&arc.v) != TCL_OK)
+     return TCL_ERROR;
+   if (arc.c < 2)
+   {
+diff -ur snacc-1.3.old/c++-lib/src/tcl-if.C snacc-1.3/c++-lib/src/tcl-if.C
+--- snacc-1.3.old/c++-lib/src/tcl-if.C	2011-02-08 18:43:23.880305500 +0300
++++ snacc-1.3/c++-lib/src/tcl-if.C	2011-02-08 18:43:55.865089900 +0300
+@@ -48,7 +48,7 @@
+ //\[banner "utility functions"]-----------------------------------------------------------------------------------------------------
+ static bool strniabbr (const char *pattern, const char *test, size_t min)
+ {
+-  register      len;
++  register size_t     len;
+ 
+   if (strlen (pattern)<min)
+     fprintf (stderr, "strniabbr(): strlen (pattern) < min\n");
+@@ -323,7 +323,7 @@
+   return result;
+ }
+ 
+-int export (Tcl_Interp *interp, int argc, char **argv)
++int _export (Tcl_Interp *interp, int argc, char **argv)
+ {
+   if (argc != 3)
+   {
+@@ -386,7 +386,7 @@
+       Tcl_HashEntry *entry = Tcl_CreateHashEntry (&types, _typename, &created);
+       if (!created)
+       {
+-	cerr << "fatal error: duplicate type " << _typename << endl;
++	std::cerr << "fatal error: duplicate type " << _typename << endl;
+ 	exit (1);
+       }
+       Tcl_SetHashValue (entry, *typedesc);
+@@ -475,7 +475,7 @@
+     case 4:
+       {
+ 	Args flags;
+-	if (Tcl_SplitList (interp, argv[3], &flags.c, &flags.v) != TCL_OK)
++	if (Tcl_SplitList (interp, argv[3], &flags.c, (const char***)&flags.v) != TCL_OK)
+ 	  return TCL_ERROR;
+ 
+ 	for (int i=0; i<flags.c; i++)
+@@ -725,7 +725,7 @@
+   }
+ 
+   Args path;
+-  if (Tcl_SplitList (interp, argv[1], &path.c, &path.v) != TCL_OK)
++  if (Tcl_SplitList (interp, argv[1], &path.c, (const char***)&path.v) != TCL_OK)
+     return TCL_ERROR;
+ 
+   if (path.c < 1)
+@@ -770,7 +770,7 @@
+   }
+ 
+   Args path;
+-  if (Tcl_SplitList (interp, argv[1], &path.c, &path.v) != TCL_OK)
++  if (Tcl_SplitList (interp, argv[1], &path.c, (const char***)&path.v) != TCL_OK)
+     return TCL_ERROR;
+ 
+   if (path.c < 1)
+@@ -809,7 +809,7 @@
+   }
+ 
+   Args path;
+-  if (Tcl_SplitList (interp, argv[1], &path.c, &path.v) != TCL_OK)
++  if (Tcl_SplitList (interp, argv[1], &path.c, (const char***)&path.v) != TCL_OK)
+     return TCL_ERROR;
+ 
+   if (path.c < 1)
+@@ -835,12 +835,12 @@
+       return TCL_ERROR;
+     }
+ 
+-cout << *var;
+-  stringstream s;
++std::cout << *var;
++  std::stringstream s;
+   s << *var;
+   s.put ('\0');
+-  cout << strlen(s.str()) << endl;
+-  cout << s.str() << endl;
++  std::cout << s.str().size() << endl;
++  std::cout << s.str() << endl;
+ 
+   return TCL_OK;
+ }
+@@ -855,7 +855,7 @@
+   }
+ 
+   Args path;
+-  if (Tcl_SplitList (interp, argv[1], &path.c, &path.v) != TCL_OK)
++  if (Tcl_SplitList (interp, argv[1], &path.c, (const char***)&path.v) != TCL_OK)
+     return TCL_ERROR;
+ 
+   if (path.c < 1)
+@@ -894,7 +894,7 @@
+   }
+ 
+   Args path;
+-  if (Tcl_SplitList (interp, argv[1], &path.c, &path.v) != TCL_OK)
++  if (Tcl_SplitList (interp, argv[1], &path.c, (const char***)&path.v) != TCL_OK)
+     return TCL_ERROR;
+ 
+   if (path.c == 1)
+@@ -931,8 +931,9 @@
+ }
+ 
+ //\[sep]----------------------------------------------------------------------------------------------------------------------------
+-int Snacc_Cmd (ClientData cd, Tcl_Interp *interp, int argc, char **argv)
++int Snacc_Cmd (ClientData cd, Tcl_Interp *interp, int argc, const char **_argv)
+ {
++  char **argv = (char **)_argv;
+   SnaccTcl *ed = (SnaccTcl *)cd;
+ 
+ #ifdef DEBUG
+@@ -957,7 +958,7 @@
+       break;
+     case 'e':
+       if (!strcmp (*argv, "export"))
+-	return export (interp, argc, argv);
++	return _export (interp, argc, argv);
+       break;
+     case 'f':
+       if (!strcmp (*argv, "finfo"))
+diff -ur snacc-1.3.old/compiler/back-ends/c++-gen/gen-code.c snacc-1.3/compiler/back-ends/c++-gen/gen-code.c
+--- snacc-1.3.old/compiler/back-ends/c++-gen/gen-code.c	2011-02-08 18:43:25.224072700 +0300
++++ snacc-1.3/compiler/back-ends/c++-gen/gen-code.c	2011-02-08 18:43:59.724514300 +0300
+@@ -1309,7 +1309,7 @@
+ 	    fprintf (src, "int %s::TclSetVal (Tcl_Interp *interp, const char *valstr)\n", td->cxxTypeDefInfo->className);
+ 	    fprintf (src, "{\n");
+ 	    fprintf (src, "  Args elem;\n");
+-	    fprintf (src, "  if (Tcl_SplitList (interp, (char*)valstr, &elem.c, &elem.v) != TCL_OK)\n");
++	    fprintf (src, "  if (Tcl_SplitList (interp, (char*)valstr, &elem.c, (const char ***)&elem.v) != TCL_OK)\n");
+ 	    fprintf (src, "    return TCL_ERROR;\n");
+ 	    fprintf (src, "  if (elem.c != 2)\n");
+ 	    fprintf (src, "  {\n");
+@@ -2105,12 +2105,12 @@
+ 	    fprintf (src, "{\n");
+ 	    fprintf (src, "  int i;\n");
+ 	    fprintf (src, "  Args elems;\n");
+-	    fprintf (src, "  if (Tcl_SplitList (interp, (char*)valstr, &elems.c, &elems.v) != TCL_OK)\n");
++	    fprintf (src, "  if (Tcl_SplitList (interp, (char*)valstr, &elems.c, (const char***)&elems.v) != TCL_OK)\n");
+ 	    fprintf (src, "    return TCL_ERROR;\n");
+ 	    fprintf (src, "  Args* elempairs = new Args[elems.c];\n");
+ 	    fprintf (src, "  for (i=0; i<elems.c; i++)\n");
+ 	    fprintf (src, "  {\n");
+-	    fprintf (src, "    if (Tcl_SplitList (interp, elems.v[i], &elempairs[i].c, &elempairs[i].v) != TCL_OK)\n");
++	    fprintf (src, "    if (Tcl_SplitList (interp, elems.v[i], &elempairs[i].c, (const char***)&elempairs[i].v) != TCL_OK)\n");
+ 	    fprintf (src, "    {\n");
+ 	    fprintf (src, "      delete elempairs;\n");
+ 	    fprintf (src, "      return TCL_ERROR;\n");
+@@ -2200,7 +2200,7 @@
+ 	    fprintf (src, "int %s::TclUnsetVal (Tcl_Interp *interp, const char *membernames)\n", td->cxxTypeDefInfo->className);
+ 	    fprintf (src, "{\n");
+ 	    fprintf (src, "  Args elems;\n");
+-	    fprintf (src, "  if (Tcl_SplitList (interp, (char*)membernames, &elems.c, &elems.v) != TCL_OK)\n");
++	    fprintf (src, "  if (Tcl_SplitList (interp, (char*)membernames, &elems.c, (const char***)&elems.v) != TCL_OK)\n");
+ 	    fprintf (src, "    return TCL_ERROR;\n");
+ 	    fprintf (src, "\n");
+ 	    fprintf (src, "  for (int i=0; i<elems.c; i++)\n");
+@@ -3206,12 +3206,12 @@
+ 	    fprintf (src, "{\n");
+ 	    fprintf (src, "  int i;\n");
+ 	    fprintf (src, "  Args elems;\n");
+-	    fprintf (src, "  if (Tcl_SplitList (interp, (char*)valstr, &elems.c, &elems.v) != TCL_OK)\n");
++	    fprintf (src, "  if (Tcl_SplitList (interp, (char*)valstr, &elems.c, (const char***)&elems.v) != TCL_OK)\n");
+ 	    fprintf (src, "    return TCL_ERROR;\n");
+ 	    fprintf (src, "  Args* elempairs = new Args[elems.c];\n");
+ 	    fprintf (src, "  for (i=0; i<elems.c; i++)\n");
+ 	    fprintf (src, "  {\n");
+-	    fprintf (src, "    if (Tcl_SplitList (interp, elems.v[i], &elempairs[i].c, &elempairs[i].v) != TCL_OK)\n");
++	    fprintf (src, "    if (Tcl_SplitList (interp, elems.v[i], &elempairs[i].c, (const char***)&elempairs[i].v) != TCL_OK)\n");
+ 	    fprintf (src, "    {\n");
+ 	    fprintf (src, "      delete elempairs;\n");
+ 	    fprintf (src, "      return TCL_ERROR;\n");
+@@ -3301,7 +3301,7 @@
+ 	    fprintf (src, "int %s::TclUnsetVal (Tcl_Interp *interp, const char *membernames)\n", td->cxxTypeDefInfo->className);
+ 	    fprintf (src, "{\n");
+ 	    fprintf (src, "  Args elems;\n");
+-	    fprintf (src, "  if (Tcl_SplitList (interp, (char*)membernames, &elems.c, &elems.v) != TCL_OK)\n");
++	    fprintf (src, "  if (Tcl_SplitList (interp, (char*)membernames, &elems.c, (const char***)&elems.v) != TCL_OK)\n");
+ 	    fprintf (src, "    return TCL_ERROR;\n");
+ 	    fprintf (src, "\n");
+ 	    fprintf (src, "  for (int i=0; i<elems.c; i++)\n");
+@@ -4148,7 +4148,7 @@
+ 	    fprintf (src, "int %s::TclSetVal (Tcl_Interp *interp, const char *valstr)\n", td->cxxTypeDefInfo->className);
+ 	    fprintf (src, "{\n");
+ 	    fprintf (src, "  Args elem;\n");
+-	    fprintf (src, "  if (Tcl_SplitList (interp, (char*)valstr, &elem.c, &elem.v) != TCL_OK)\n");
++	    fprintf (src, "  if (Tcl_SplitList (interp, (char*)valstr, &elem.c, (const char ***)&elem.v) != TCL_OK)\n");
+ 	    fprintf (src, "    return TCL_ERROR;\n");
+ 	    fprintf (src, "\n");
+ 	    fprintf (src, "  while (First())\n");
+diff -ur snacc-1.3.old/tcl-asn/tclasn.c snacc-1.3/tcl-asn/tclasn.c
+--- snacc-1.3.old/tcl-asn/tclasn.c	2011-02-08 18:43:28.161610300 +0300
++++ snacc-1.3/tcl-asn/tclasn.c	2011-02-08 18:43:55.880715100 +0300
+@@ -18,7 +18,7 @@
+     int readError;
+ } ChannelBuf;
+ 
+-static void PutChannelBufInGenBuf _ANSI_ARGS_((Tcl_Channel chan, GenBuf* gb));
++static void PutChannelBufInGenBuf _ANSI_ARGS_((ChannelBuf* chan, GenBuf* gb));
+ 
+ static unsigned char
+ ChanGetByte (cb)
