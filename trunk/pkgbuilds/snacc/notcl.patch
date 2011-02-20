@@ -1,0 +1,23 @@
+fix for libasn1tcl.a»: no such file or directory
+--- snacc-1.3/c++-lib/makefile.1	2011-02-20 16:19:55.000000000 +0300
++++ snacc-1.3/c++-lib/makefile	2011-02-20 16:19:57.000000000 +0300
+@@ -274,7 +274,7 @@
+ install::
+ 		for h in $(HFILES) $(HFILES.shared); do $(INSTALL_DATA) $$h $(incdir)/snacc/c++/; done
+ 		for l in $(LIB); do $(INSTALL_DATA) $$l $(libexecdir)/; $(RANLIB) -t $(libexecdir)/$$l; done
+-		if [ $d != tcl ]; then $(MAKE) LIB=libasn1tcl.a d=tcl $@; fi
++		#if [ $d != tcl ]; then $(MAKE) LIB=libasn1tcl.a d=tcl $@; fi
+ 
+ clean::
+ 		$(RM) stamp-useful
+--- snacc-1.3/makefile.1	2011-02-20 16:37:56.000000000 +0300
++++ snacc-1.3/makefile	2011-02-20 16:38:06.000000000 +0300
+@@ -67,7 +67,7 @@
+ 
+ SUBDIRS		= compiler c-lib c++-lib tbl-tools asn1specs doc
+ XDIRS		= tcl-lib tcl-asn
+-EXAMPLESDIRS	= c-examples c++-examples tbl-example tcl-example
++EXAMPLESDIRS	= c-examples c++-examples tbl-example
+ 
+ DISTFILES = \
+ 	COPYING						\

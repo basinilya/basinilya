@@ -1,7 +1,7 @@
 pkgname=snacc
 pkgver=1.3
 pkgrel=1
-pkgdesc="asdasda"
+pkgdesc="ASN.1 to C or C++ or IDL compiler"
 arch=(i686 x86_64 cygwin)
 url="http://asdadadasd/"
 license=('custom')
@@ -10,17 +10,20 @@ source=(
         "ftp://ftp.skynet.be/mirror1/tucows.skynet.be/linux/files/console/dev/snacc-1.3.tar.gz"
         "http://archive.ubuntu.com/ubuntu/pool/universe/s/snacc/snacc_1.3bbn-9.2.diff.gz"
         tcl.patch
+        notcl.patch
         mkdep.gcc.sh
         )
 
-_md5sums=('12aa8c037a3ad4821564d8d84af5e07b'
-          '76de96a8a2e4fac5127db54d64df3f7c')
+md5sums=('12aa8c037a3ad4821564d8d84af5e07b'
+         '2e20e7b850ce42267c95126c176bcfd7'
+         '6d047c2e3c0647168696570140564d5f'
+         '818e3628a8789046f1863599d8a20c61'
+         '76de96a8a2e4fac5127db54d64df3f7c')
 
 _cygwin_groups=('Utils')
-_cygwin_lpkgdesc="zasadasd
-asdasdasd
-asdasdasdas
-asdaddasdasd"
+_cygwin_lpkgdesc="Snacc is short for 'Sample Neufeld ASN.1 to C Compiler' and ASN.1 stands for Abstract Syntax Notation One
+(ITU-T X.208/ISO 8824). Snacc supports a subset of ASN.1 1988. If you need features of ASN.1 1992 or later,
+snacc is not for you."
 
 _prefix=/usr
 build() {
@@ -34,5 +37,6 @@ build() {
   #MKDEP="env CC=gcc-3 $srcdir/mkdep.gcc.sh" CC=gcc-3 CXX=g++-3
   MKDEP="$srcdir/mkdep.gcc.sh" ./configure --prefix="$_prefix"
   make
+  [ -f ./c++-lib/libasn1tcl.a ] || patch -Np1 -i ../notcl.patch
   make prefix="$pkgdir/usr" install
 }
