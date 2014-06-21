@@ -1,0 +1,44 @@
+Package: luci-app-ncm-status
+Version: svn-r9961-1
+Depends: libc, luci-proto-ncm
+Source: feeds/luci/contrib/package/luci
+Section: luci
+Maintainer: LuCI Development Team <luci@lists.subsignal.org>
+Architecture: all
+Installed-Size: 4156
+Description:  Diagnostics for NCM dongle
+Filename: luci-app-ncm-status_svn-r9961-1_all.ipk
+
+Package: luci-proto-ncm
+Version: svn-r9961-1
+Depends: libc
+Source: feeds/luci/contrib/package/luci
+Section: luci
+Maintainer: LuCI Development Team <luci@lists.subsignal.org>
+Architecture: all
+Installed-Size: 2113
+Description:  Support for NCM protocol:ncm
+Filename: luci-proto-ncm_svn-r9961-1_all.ipk
+
+Package: ncm-huawei-e3276
+Version: 1.0.1-1
+Depends: libc, comgt, kmod-usb-serial, kmod-usb-serial-option, ncm
+Source: feeds/packages/net/ncm
+Section: net
+Maintainer: Oskari Rauta <oskari.rauta at gmail com>
+Architecture: all
+Installed-Size: 1762
+Description:  Huawei E3276 support for NCM protocol
+Filename: ncm-huawei-e3276_1.0.1-1_all.ipk
+
+Package: ncm
+Version: 1.0.1-1
+Depends: libc, comgt, kmod-usb-net-cdc-ncm, kmod-usb-serial
+Source: feeds/packages/net/ncm
+Section: net
+Maintainer: Oskari Rauta <oskari.rauta at gmail com>
+Architecture: all
+Installed-Size: 2815
+Description:  Protocol support for NCM
+Filename: ncm_1.0.1-1_all.ipk
+
