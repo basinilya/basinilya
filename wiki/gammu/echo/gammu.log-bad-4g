@@ -1,0 +1,61 @@
+Open config: "/home/il/.config/gammu/config"
+Open config: "/home/il/.gammurc"
+1.36.3Executing proxy command: exec ssh -q root@192.168.2.1 /usr/local/bin/mycomm2 /dev/ttyUSB0[Module           - "auto"]
+Escaping SMS mode
+Sending simple AT command to wake up some devices
+AT1 "AT"
+2 "OK"
+Checking line: OK
+AT reply state: 1
+	AT
+OK
+1 "^RSSI:25"
+Checking line: ^RSSI:25
+AT reply state: 4
+
+^RSSI:25
+1 "^RSSI:27"
+Checking line: ^RSSI:27
+AT reply state: 4
+
+^RSSI:27
+1 "^RSSI:24"
+Checking line: ^RSSI:24
+AT reply state: 4
+
+^RSSI:24
+1 "^RSSI:26"
+Checking line: ^RSSI:26
+AT reply state: 4
+
+^RSSI:26
+1 "^RSSI:25"
+Checking line: ^RSSI:25
+AT reply state: 4
+
+^RSSI:25
+1 "^RSSI:24"
+Checking line: ^RSSI:24
+AT reply state: 4
+
+^RSSI:24
+1 "^RSSI:24"
+Checking line: ^RSSI:24
+AT reply state: 4
+
+^RSSI:24
+1 "^RSSI:25"
+Checking line: ^RSSI:25
+AT reply state: 4
+
+^RSSI:25
+1 "^RSSI:24"
+Checking line: ^RSSI:24
+AT reply state: 4
+
+^RSSI:24
+1 "^RSSI:27"
+Checking line: ^RSSI:27
+AT reply state: 4
+
+^RSSI:27
