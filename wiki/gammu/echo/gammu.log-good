@@ -1,0 +1,223 @@
+Open config: "/home/il/.config/gammu/config"
+Open config: "/home/il/.gammurc"
+1.36.3Executing proxy command: exec ssh -q root@192.168.2.1 /usr/local/bin/mycomm2 /dev/ttyUSB0[Module           - "auto"]
+Escaping SMS mode
+Sending simple AT command to wake up some devices
+AT1 "OK"
+Checking line: OK
+AT reply state: 1
+OK
+Enabling echo
+ATE11 "OK"
+Checking line: OK
+AT reply state: 1
+OK
+Trying Motorola mode switch
+
+AT+MODE=21 "AT+MODE=2"
+2 "COMMAND NOT SUPPORT"
+Checking line: COMMAND NOT SUPPORT
+AT reply state: 3
+!AT+MODE=2
+COMMAND NOT SUPPORT
+Seems not to be supported
+Enabling CME errors
+
+AT+CMEE=11 "AT+CMEE=1"
+2 "OK"
+Checking line: OK
+AT reply state: 1
+AT+CMEE=1
+OK
+	AT+CSCS?1 "AT+CSCS?"
+2 "+CSCS: "GSM""
+3 "OK"
+Checking line: OK
+AT reply state: 1
+AT+CSCS?
++CSCS: "GSM"
+
+OK
+AT+CGMI1 "AT+CGMI"
+2 "huawei"
+3 "OK"
+Checking line: OK
+AT reply state: 1
+AT+CGMI
+huawei
+
+OK
+Manufacturer info received
+[Manufacturer: Huawei]
+
+AT+CSCS=?1 "AT+CSCS=?"
+2 "+CSCS: ("IRA","UCS2","GSM")"
+3 "OK"
+Checking line: OK
+AT reply state: 1
+/AT+CSCS=?
++CSCS: ("IRA","UCS2","GSM")
+
+OK
+Chosen GSM as normal charset
+Chosen UCS2 as unicode charset
+Getting model
+AT+CGMM1 "AT+CGMM"
+2 "E3276"
+3 "OK"
+Checking line: OK
+AT reply state: 1
+AT+CGMM
+E3276
+
+OK
+Unknown model, but it should still work
+[Model name: `E3276']
+[Model data: `']
+[Model data: `unknown']
+Checking for OBEX support
+AT+CPROT=?1 "AT+CPROT=?"
+2 "COMMAND NOT SUPPORT"
+Checking line: COMMAND NOT SUPPORT
+AT reply state: 3
+"AT+CPROT=?
+COMMAND NOT SUPPORT
+Checking for SYNCML/OBEX support
+AT+SYNCML=?1 "AT+SYNCML=?"
+2 "COMMAND NOT SUPPORT"
+Checking line: COMMAND NOT SUPPORT
+AT reply state: 3
+#AT+SYNCML=?
+COMMAND NOT SUPPORT
+Checking for SYNCML/OBEX support
+AT$TSSPCSW=?1 "AT$TSSPCSW=?"
+2 "COMMAND NOT SUPPORT"
+Checking line: COMMAND NOT SUPPORT
+AT reply state: 3
+$AT$TSSPCSW=?
+COMMAND NOT SUPPORT
+[Module           - "A2D|iPAQ|at|M20|S25|MC35|TC35|C35i|S65|S300|5110|5130|5190|5210|6110|6130|6150|6190|6210|6250|6310|6310i|6510|7110|8210|8250|8290|8310|8390|8850|8855|8890|8910|9110|9210"]
+Escaping SMS mode
+Sending simple AT command to wake up some devices
+AT1 "AT"
+2 "OK"
+Checking line: OK
+AT reply state: 1
+	AT
+OK
+Enabling echo
+ATE11 "ATE1"
+2 "OK"
+Checking line: OK
+AT reply state: 1
+ATE1
+OK
+Trying Motorola mode switch
+
+AT+MODE=21 "AT+MODE=2"
+2 "COMMAND NOT SUPPORT"
+Checking line: COMMAND NOT SUPPORT
+AT reply state: 3
+!AT+MODE=2
+COMMAND NOT SUPPORT
+Seems not to be supported
+Enabling CME errors
+
+AT+CMEE=11 "AT+CMEE=1"
+2 "OK"
+Checking line: OK
+AT reply state: 1
+AT+CMEE=1
+OK
+	AT+CSCS?1 "AT+CSCS?"
+2 "+CSCS: "GSM""
+3 "OK"
+Checking line: OK
+AT reply state: 1
+AT+CSCS?
++CSCS: "GSM"
+
+OK
+AT+CGMI1 "AT+CGMI"
+2 "huawei"
+3 "OK"
+Checking line: OK
+AT reply state: 1
+AT+CGMI
+huawei
+
+OK
+Manufacturer info received
+[Manufacturer: Huawei]
+
+AT+CSCS=?1 "AT+CSCS=?"
+2 "+CSCS: ("IRA","UCS2","GSM")"
+3 "OK"
+Checking line: OK
+AT reply state: 1
+/AT+CSCS=?
++CSCS: ("IRA","UCS2","GSM")
+
+OK
+Chosen GSM as normal charset
+Chosen UCS2 as unicode charset
+Checking for OBEX support
+AT+CPROT=?1 "AT+CPROT=?"
+2 "COMMAND NOT SUPPORT"
+Checking line: COMMAND NOT SUPPORT
+AT reply state: 3
+"AT+CPROT=?
+COMMAND NOT SUPPORT
+Checking for SYNCML/OBEX support
+AT+SYNCML=?1 "AT+SYNCML=?"
+2 "COMMAND NOT SUPPORT"
+Checking line: COMMAND NOT SUPPORT
+AT reply state: 3
+#AT+SYNCML=?
+COMMAND NOT SUPPORT
+Checking for SYNCML/OBEX support
+AT$TSSPCSW=?1 "AT$TSSPCSW=?"
+2 "COMMAND NOT SUPPORT"
+Checking line: COMMAND NOT SUPPORT
+AT reply state: 3
+$AT$TSSPCSW=?
+COMMAND NOT SUPPORT
+Getting firmware versions
+AT+CGMR1 "AT+CGMR"
+2 "21.260.03.00.209"
+3 "OK"
+Checking line: OK
+AT reply state: 1
+"AT+CGMR
+21.260.03.00.209
+
+OK
+Received firmware version: "21.260.03.00.209"
+Number version is "21.260030"
+[Connected]
+Entering GSM_GetSMSFolders
+Getting available SMS memories
+
+AT+CPMS=?1 "AT+CPMS=?"
+2 "+CPMS: ("SM","ME"),("SM","ME"),("SM","ME")"
+3 "OK"
+Checking line: OK
+AT reply state: 1
+>AT+CPMS=?
++CPMS: ("SM","ME"),("SM","ME"),("SM","ME")
+
+OK
+Available SMS memories received: read: ME : ok, SM : ok, save: ME : ok, SM = ok, Motorola = no
+Setting SMS memory type to ME
+AT+CPMS="ME"1 "AT+CPMS="ME""
+2 "+CPMS: 0,20,0,20,15,15"
+3 "OK"
+Checking line: OK
+AT reply state: 1
+-AT+CPMS="ME"
++CPMS: 0,20,0,20,15,15
+
+OK
+Leaving GSM_GetSMSFolders
+[Terminating]
+[Closing]
