@@ -25,13 +25,13 @@ Version: 1.0.2-1
 Depends: libc, ncm, comgt, kmod-usb-serial
 Source: package/net/ncm
 Section: net
-Maintainer: Oskari Rauta <oskari.rauta at gmail.com>
+Maintainer: Ilya Basin <basinilya at gmail.com>
 Architecture: all
 Installed-Size: 1764
 Filename: ncm-huawei-e3276_1.0.2-1_all.ipk
-Size: 2349
-MD5Sum: fc618a317c2cb1b502f899966c77626d
-SHA256sum: 176e43e3fccf9d3e365330edbca5067cd525233a3338254e6be20fa079db3419
+Size: 2344
+MD5Sum: cb7da5f395230c7532c62310751ead42
+SHA256sum: 55bdd6cabfe7cec0307e3d1ae282591c002139469de16fbbad7022caee9f7905
 Description:  This package contains communication scripts for Huawei E3276
 
 Package: ncm
@@ -39,11 +39,11 @@ Version: 1.0.2-1
 Depends: libc, comgt, kmod-usb-net-cdc-ncm, kmod-usb-serial
 Source: package/net/ncm
 Section: net
-Maintainer: Oskari Rauta <oskari.rauta at gmail.com>
+Maintainer: Ilya Basin <basinilya at gmail.com>
 Architecture: all
-Installed-Size: 1831
+Installed-Size: 1825
 Filename: ncm_1.0.2-1_all.ipk
-Size: 2400
-MD5Sum: 129ac1e001ba11cefc839cf7e0485608
-SHA256sum: 200529c3e890e134bd7a8a940dc3ee138fad2c950fde19cae057f6b1967de9bc
+Size: 2399
+MD5Sum: 1da0875aaa2601f8910fec10f8c2a57f
+SHA256sum: 48f4aa1d64426ed812141ed4846122d34eec7cfbdc383eea719200fac3614796
 Description:  This package contains protocol support for NCM.
